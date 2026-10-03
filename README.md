@@ -53,7 +53,7 @@ No necesita instalar nada: abre `index.html` en el navegador. También funciona 
 web estática (GitHub Pages, Netlify…):
 
 ```sh
-npm start          # sirve la carpeta en http://localhost:8080
+npm run dev        # sirve la carpeta en http://localhost:8080 (también: npm start)
 ```
 
 La partida se guarda en el navegador, así que si se recarga la página se puede seguir.
