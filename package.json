@@ -1,0 +1,12 @@
+{
+  "name": "previa-en-shanghai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Juego de previa para beber en grupo en el que también juega quien no bebe alcohol.",
+  "scripts": {
+    "start": "npx --yes serve -l 8080 .",
+    "test": "node --test tests/content.test.js tests/engine.test.js",
+    "test:e2e": "node --test tests/e2e.test.js"
+  },
+  "license": "MIT"
+}

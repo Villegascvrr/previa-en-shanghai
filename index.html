@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Previa en Shanghai</title>
+<meta name="description" content="Juego de previa para beber en grupo en el que también juega quien no bebe alcohol.">
+<meta name="theme-color" content="#120d22">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Bungee&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Preparación -->
+  <section id="screen-setup" class="screen setup" aria-labelledby="logo">
+    <header class="brand">
+      <div class="sign" aria-hidden="true"><span>上</span><span>海</span></div>
+      <div class="brand-text">
+        <h1 id="logo" class="logo">Previa<span class="logo-sub">en Shanghai</span></h1>
+        <p class="tagline">El juego de la previa en el que juega todo el mundo, beba o no beba.</p>
+      </div>
+    </header>
+
+    <section class="block" aria-labelledby="h-players">
+      <h2 id="h-players" class="block-title">Quién juega</h2>
+      <p class="block-note">Marca quién bebe alcohol. Quien no bebe juega igual: cuando le toque pagar, hace su alternativa.</p>
+      <ul id="player-list" class="players"></ul>
+      <form id="add-form" class="add-row" autocomplete="off">
+        <label class="sr-only" for="add-name">Nombre de la nueva persona</label>
+        <input id="add-name" class="input" type="text" maxlength="20" placeholder="Nombre" enterkeyhint="done">
+        <button class="btn" type="submit">Añadir</button>
+      </form>
+      <p id="setup-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section class="block" aria-labelledby="h-mode">
+      <h2 id="h-mode" class="block-title">Modo de juego</h2>
+      <div id="mode-list" class="modes" role="radiogroup" aria-labelledby="h-mode"></div>
+    </section>
+
+    <section class="block" aria-labelledby="h-settings">
+      <h2 id="h-settings" class="block-title">Ajustes</h2>
+      <div id="setup-settings" class="settings"></div>
+    </section>
+
+    <aside class="howto" aria-labelledby="h-howto">
+      <h2 id="h-howto" class="block-title">Cómo se paga</h2>
+      <dl class="pay-legend">
+        <div><dt><span class="tag tag-drink">🍺 Bebe</span></dt><dd>Bebe los tragos que diga la carta. Un trago es un sorbo, no un chupito.</dd></div>
+        <div><dt><span class="tag tag-sober">🧃 Sin alcohol</span></dt><dd>Hace su alternativa: un mini-reto o sorbos de su bebida, como elijáis en los ajustes.</dd></div>
+      </dl>
+      <p class="block-note">Pasar siempre está permitido. Si alguien deja de beber a mitad de noche, se cambia en el marcador sin parar la partida. Y agua entre carta y carta.</p>
+    </aside>
+
+    <div class="startbar">
+      <button id="resume-btn" class="btn ghost" type="button" hidden>Seguir la partida</button>
+      <button id="start-btn" class="btn primary" type="button">Empezar</button>
+    </div>
+  </section>
+
+  <!-- Partida -->
+  <section id="screen-game" class="screen game" hidden aria-label="Partida">
+    <header class="topbar">
+      <p class="topbar-info"><span id="g-count" class="num">Carta 1</span><span class="dot" aria-hidden="true">·</span><span id="g-mode">Todo un poco</span></p>
+      <button id="open-sheet" class="btn small" type="button" aria-haspopup="dialog">Marcador</button>
+    </header>
+    <ul id="rules" class="rules" aria-label="Reglas activas"></ul>
+    <article id="card" class="card" aria-live="polite"></article>
+    <div id="actions" class="actions"></div>
+  </section>
+
+  <!-- Final -->
+  <section id="screen-end" class="screen end" hidden aria-labelledby="end-title">
+    <h2 id="end-title" class="end-title">Se acabó la previa</h2>
+    <p id="end-sub" class="block-note"></p>
+    <ul id="awards" class="awards"></ul>
+    <div class="table-wrap">
+      <table class="score">
+        <thead><tr><th scope="col">Persona</th><th scope="col">Hechos</th><th scope="col">Pagos</th><th scope="col">Duelos</th><th scope="col">Comod.</th></tr></thead>
+        <tbody id="end-table"></tbody>
+      </table>
+    </div>
+    <div class="end-actions">
+      <button id="rematch-btn" class="btn primary" type="button">Revancha</button>
+      <button id="home-btn" class="btn ghost" type="button">Cambiar jugadores o modo</button>
+    </div>
+  </section>
+
+  <!-- Marcador y ajustes durante la partida -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <header class="sheet-head">
+        <h2 id="sheet-title" class="block-title">Marcador</h2>
+        <button class="btn small" type="button" data-close>Volver</button>
+      </header>
+      <p class="block-note">Toca 🍺 / 🧃 si alguien empieza o deja de beber. La partida sigue igual.</p>
+      <ul id="sheet-players" class="players sheet-players"></ul>
+      <form id="sheet-add" class="add-row" autocomplete="off">
+        <label class="sr-only" for="sheet-add-name">Nombre de quien se une</label>
+        <input id="sheet-add-name" class="input" type="text" maxlength="20" placeholder="Se une alguien más" enterkeyhint="done">
+        <button class="btn" type="submit">Añadir</button>
+      </form>
+      <p id="sheet-error" class="error" role="alert" hidden></p>
+      <h3 class="sheet-sub">Ajustes de la partida</h3>
+      <div id="sheet-settings" class="settings"></div>
+      <button id="end-btn" class="btn danger" type="button">Terminar partida</button>
+    </div>
+  </div>
+
+</div>
+<script src="js/cards.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
