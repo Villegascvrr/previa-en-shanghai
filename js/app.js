@@ -117,8 +117,13 @@
   function hotHelp(settings) {
     var mode = E.getMode(settings.mode);
     if (mode.maxHot === 0) return 'El modo Rompehielos nunca tiene picante.';
-    if (mode.minHot && settings.hot < mode.minHot) return 'El modo Picante usa como mínimo «Un poco».';
-    return ['Ni una pregunta de ligoteo.', 'Algo de ligoteo y citas, nada fuerte.', 'Preguntas y retos más atrevidos, sin pasarse.'][settings.hot];
+    if (mode.minHot && settings.hot < mode.minHot) return 'El modo Picante usa como mínimo «Picante».';
+    return [
+      'Ni una pregunta de ligoteo.',
+      'Ligoteo, citas y crushes. Nada de sexo.',
+      'Rollos, cuernos, fotos subidas de tono y secretos del grupo.',
+      'Sexo sin censura: fantasías, posturas y «yo nunca lo he hecho en…». Solo con gente de confianza.'
+    ][settings.hot];
   }
 
   function altHelp(settings) {
@@ -293,7 +298,7 @@
 
     var top = h('div', { class: 'card-top' }, [
       h('span', { class: 'card-label', text: v.label }),
-      v.hot ? h('span', { class: 'card-hot', text: v.hot === 2 ? 'Picante' : 'Un poco picante' }) : null
+      v.hot ? h('span', { class: 'card-hot', text: ['', 'Ligoteo', 'Picante', 'Sin filtro'][v.hot] }) : null
     ]);
     card.appendChild(top);
 

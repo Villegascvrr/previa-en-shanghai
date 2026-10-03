@@ -21,6 +21,7 @@
   --orange: #ff9b52;
   --pink: #ff82c9;
   --cyan: #59e3e8;
+  --lime: #c6f26b;
   --on-accent: #1a0d14;
 
   /* Tipografía */
@@ -424,6 +425,7 @@ select.input { appearance: auto; }
 .card[data-type="grupo"] { --tube: var(--pink); }
 .card[data-type="categoria"] { --tube: var(--violet); }
 .card[data-type="regla"] { --tube: var(--cyan); }
+.card[data-type="prefieres"] { --tube: var(--lime); }
 .card[data-type="choice"] { --tube: var(--paper); }
 
 .card.deal { animation: deal 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }

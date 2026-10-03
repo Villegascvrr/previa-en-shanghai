@@ -45,7 +45,7 @@ test('createGame valida a las personas', () => {
 test('los ajustes raros se corrigen', () => {
   const s = E.normalizeSettings({ mode: 'inventado', hot: 9, alt: 'nada', comodines: -3 });
   assert.equal(s.mode, 'mezcla');
-  assert.equal(s.hot, 2);
+  assert.equal(s.hot, 3);
   assert.equal(s.alt, 'castigo');
   assert.equal(s.comodines, 0);
 });
@@ -53,7 +53,7 @@ test('los ajustes raros se corrigen', () => {
 test('miles de cartas seguidas en todos los modos sin romper nada', () => {
   let seed = 10;
   for (const mode of E.MODES) {
-    for (const hot of [0, 1, 2]) {
+    for (const hot of [0, 1, 2, 3]) {
       for (const count of [2, 3, 4]) {
         const rng = seeded(seed++);
         const players = PLAYERS.slice(0, count);
@@ -320,9 +320,9 @@ test('cambiar si alguien bebe cambia su forma de pagar al momento', () => {
 
 test('bajar el picante en mitad de la partida pide cambiar la carta picante', () => {
   const rng = seeded(23);
-  const g = game({ mode: 'picante', hot: 2 });
+  const g = game({ mode: 'picante', hot: 3 });
   E.drawNext(g, rng);
-  assert.ok(cardOf(g.current.cardId).hot >= 1);
+  assert.ok(cardOf(g.current.cardId).hot >= 2);
   const mustRedraw = E.updateSettings(g, { mode: 'rompehielos' }, rng);
   assert.equal(mustRedraw, true);
   E.redraw(g, rng);
@@ -374,4 +374,30 @@ test('los nombres se pintan aparte y nunca se interpretan como HTML', () => {
     { kind: 'name', value: 'Luis' },
     { kind: 'text', value: ': hola' }
   ]);
+});
+
+test('con picante alto salen sobre todo cartas picantes', () => {
+  const count = (settings, seed) => {
+    const rng = seeded(seed);
+    const g = game(settings, PLAYERS, seed);
+    let spicy = 0;
+    for (let i = 0; i < 300; i++) {
+      const cur = E.drawNext(g, rng);
+      if (cardOf(cur.cardId).hot >= 2) spicy++;
+    }
+    return spicy / 300;
+  };
+  assert.ok(count({ mode: 'mezcla', hot: 3 }, 29) > 0.4, 'Sin filtro en Todo un poco tiene que picar');
+  assert.equal(count({ mode: 'mezcla', hot: 1 }, 31), 0, 'con «Ligoteo» no sale nada picante');
+  assert.equal(count({ mode: 'picante', hot: 2 }, 37), 1);
+  assert.equal(E.spicePreference(E.normalizeSettings({ mode: 'picante', hot: 3 })), 3);
+  assert.equal(E.spicePreference(E.normalizeSettings({ mode: 'rompehielos', hot: 3 })), 0);
+});
+
+test('¿Qué prefieres? necesita 3 personas', () => {
+  const rng = seeded(41);
+  const two = game({ mode: 'prefieres' }, PLAYERS.slice(0, 2), 41);
+  for (let i = 0; i < 30; i++) assert.notEqual(E.drawNext(two, rng).type, 'prefieres');
+  const three = game({ mode: 'prefieres' }, PLAYERS.slice(0, 3), 41);
+  for (let i = 0; i < 30; i++) assert.equal(E.drawNext(three, rng).type, 'prefieres');
 });

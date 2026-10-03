@@ -27,12 +27,22 @@ bajar el picante.
 | Rompehielos | Suave y sin picante, para cuando aún no os conocéis mucho |
 | Verdad o reto | Cada persona elige en su turno |
 | Yo nunca | El clásico |
+| ¿Qué prefieres? | Dilemas imposibles: todo el mundo vota y paga el bando que pierde (desde 3 personas) |
 | ¿Quién es más probable? | Todo el mundo señala a la vez (desde 3 personas) |
 | Retos y duelos | Menos hablar y más hacer |
-| Picante | Solo cartas de ligoteo, citas y secretos (sin pasarse) |
+| Picante | Solo cartas picantes: rollos, cuernos, secretos y, con «Sin filtro», sexo |
 
-Picante: **Sin picante**, **Un poco** o **Picante**. Nada explícito: las cartas buscan risas,
-no vergüenza ajena.
+Niveles de picante:
+
+| Nivel | Qué entra |
+| --- | --- |
+| Sin picante | Secretos, cotilleos del grupo y retos con el móvil, sin nada de ligoteo |
+| Un poco | Ligoteo, citas, crushes y ex |
+| Picante (por defecto) | Rollos, cuernos, fotos subidas de tono, «¿con quién de aquí te liarías?» |
+| Sin filtro | Sexo sin censura: fantasías, posturas, sitios… Solo para adultos y con confianza |
+
+Con picante alto, el juego adelanta las cartas picantes para que no se pierdan entre las suaves.
+Los retos con contacto siempre son «si le parece bien»: negarse es pasar, y pasar es pagar.
 
 Tipos de carta:
 
@@ -42,7 +52,8 @@ Tipos de carta:
 - **Duelo**: dos personas se enfrentan y paga quien pierde.
 - **Todos**: cartas para el grupo («pagan quienes lleven algo negro», brindis…).
 - **Categorías**: por turnos se dicen cosas de una categoría; paga quien se quede en blanco.
-- **Nueva regla**: una norma que dura unas cuantas cartas.
+- **¿Qué prefieres?**: todo el mundo vota a la vez; paga el bando con menos votos.
+- **Nueva regla**: una norma que dura unas cuantas cartas (como los «virus» de Picolo).
 
 Al terminar salen premios (más retos cumplidos, más duelos ganados…) y una tabla con cómo le
 ha ido a cada persona. Los premios no cuentan alcohol: gana quien más se atreve, no quien más bebe.
@@ -61,7 +72,7 @@ La partida se guarda en el navegador, así que si se recarga la página se puede
 ## Añadir cartas
 
 Todas las cartas están en [`js/cards.js`](js/cards.js), agrupadas por tipo. Cada carta es
-`[picante, 'texto']`, donde `{p}` es la persona a la que le toca y `{p2}` otra persona al azar.
+`[picante, 'texto']` (picante de 0 a 3), donde `{p}` es la persona a la que le toca y `{p2}` otra persona al azar.
 Añade las nuevas al final de cada lista y pasa los tests.
 
 ## Tests

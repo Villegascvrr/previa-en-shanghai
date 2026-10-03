@@ -137,7 +137,8 @@ test('Verdad o reto y modo con pocas personas', { skip: !playwright && 'playwrig
     await page.locator('#player-list .icon-btn').last().click();
     await page.locator('#player-list .icon-btn').last().click();
     assert.equal(await page.locator('#player-list .player').count(), 2);
-    await page.getByText('Necesita 3 personas o más').waitFor();
+    await page.locator('#mode-probable').getByText('Necesita 3 personas o más').waitFor();
+    await page.locator('#mode-prefieres').getByText('Necesita 3 personas o más').waitFor();
 
     await page.click('#mode-verdadoreto');
     await page.click('#start-btn');

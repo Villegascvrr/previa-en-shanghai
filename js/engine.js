@@ -25,19 +25,24 @@
     duelo: { label: 'Duelo', hint: 'Quien pierda, paga.', target: 'duel', n: 2 },
     grupo: { label: 'Todos', hint: '', target: 'group', n: 1 },
     categoria: { label: 'Categorías', hint: 'Empieza {p} y seguís en orden. Quien se quede en blanco o repita, paga.', target: 'group', n: 2 },
-    regla: { label: 'Nueva regla', hint: 'Quien la rompa, paga.', target: 'group', n: 1 }
+    regla: { label: 'Nueva regla', hint: 'Quien la rompa, paga.', target: 'group', n: 1 },
+    prefieres: {
+      label: '¿Qué prefieres?',
+      hint: 'A la de tres, todo el mundo vota: mano arriba la primera opción, abajo la segunda. Paga el bando con menos votos. Si hay empate, paga todo el mundo.',
+      target: 'group', n: 1, minPlayers: 3
+    }
   };
 
   var MODES = [
     {
       id: 'mezcla', name: 'Todo un poco',
       desc: 'Verdades, retos, yo nunca, duelos y reglas. Para empezar, este.',
-      weights: { pregunta: 3, reto: 3, yonunca: 2, probable: 2, duelo: 1, grupo: 1.5, categoria: 1, regla: 1 }
+      weights: { pregunta: 3, reto: 3, yonunca: 2, probable: 2, prefieres: 1.5, duelo: 1, grupo: 1.5, categoria: 1, regla: 1 }
     },
     {
       id: 'rompehielos', name: 'Rompehielos',
       desc: 'Suave y sin picante, para cuando aún os estáis conociendo.',
-      weights: { pregunta: 3, yonunca: 2, probable: 2, grupo: 2, categoria: 2, duelo: 1 },
+      weights: { pregunta: 3, yonunca: 2, probable: 2, prefieres: 2, grupo: 2, categoria: 2, duelo: 1 },
       maxHot: 0
     },
     {
@@ -58,22 +63,29 @@
       minPlayers: 3
     },
     {
+      id: 'prefieres', name: '¿Qué prefieres?',
+      desc: 'Dilemas imposibles. Todo el mundo vota y paga el bando que pierde. Desde 3 personas.',
+      weights: { prefieres: 1 },
+      minPlayers: 3
+    },
+    {
       id: 'retos', name: 'Retos y duelos',
       desc: 'Menos hablar y más hacer. Para cuando la fiesta ya está arriba.',
       weights: { reto: 4, duelo: 2, grupo: 1, regla: 1 }
     },
     {
       id: 'picante', name: 'Picante',
-      desc: 'Solo cartas con picante: ligoteo, citas y algún secreto.',
-      weights: { pregunta: 3, reto: 2, yonunca: 3, probable: 2, grupo: 1, categoria: 1, duelo: 0.5 },
-      minHot: 1
+      desc: 'Solo cartas picantes: rollos, cuernos, secretos y algo más. Con «Sin filtro», sin censura.',
+      weights: { pregunta: 3, reto: 2.5, yonunca: 3, probable: 2, prefieres: 1.5, grupo: 1, categoria: 1, duelo: 0.5, regla: 0.5 },
+      minHot: 2
     }
   ];
 
   var HOT_LEVELS = [
     { id: 0, name: 'Sin picante' },
     { id: 1, name: 'Un poco' },
-    { id: 2, name: 'Picante' }
+    { id: 2, name: 'Picante' },
+    { id: 3, name: 'Sin filtro' }
   ];
 
   var ALT_MODES = [
@@ -82,7 +94,8 @@
     { id: 'elige', name: 'Que elijan', desc: 'En cada carta eligen entre sorbos o mini-reto.' }
   ];
 
-  var DEFAULT_SETTINGS = { mode: 'mezcla', hot: 1, alt: 'castigo', comodines: 2 };
+  var MAX_HOT = 3;
+  var DEFAULT_SETTINGS = { mode: 'mezcla', hot: 2, alt: 'castigo', comodines: 2 };
 
   var CARD_BY_ID = {};
   DATA.cards.forEach(function (c) { CARD_BY_ID[c.id] = c; });
@@ -135,7 +148,7 @@
     var s = Object.assign({}, base || DEFAULT_SETTINGS);
     input = input || {};
     if (input.mode !== undefined && MODES.some(function (m) { return m.id === input.mode; })) s.mode = input.mode;
-    if (input.hot !== undefined) s.hot = clampInt(input.hot, 0, 2, s.hot);
+    if (input.hot !== undefined) s.hot = clampInt(input.hot, 0, MAX_HOT, s.hot);
     if (input.alt !== undefined && ALT_MODES.some(function (a) { return a.id === input.alt; })) s.alt = input.alt;
     if (input.comodines !== undefined) s.comodines = clampInt(input.comodines, 0, 5, s.comodines);
     return s;
@@ -155,6 +168,16 @@
   }
 
   /* playerCount es opcional: si se pasa, quita cartas que necesitan más gente. */
+  /* Picante mínimo que se prioriza al robar (0 = sin preferencia). */
+  function spicePreference(settings) {
+    var mode = getMode(settings.mode);
+    if (mode.maxHot !== undefined || settings.hot < 2) return 0;
+    var range = hotRange(settings);
+    var pref = settings.hot - 1;
+    if (pref <= range[0]) pref = range[1] > range[0] ? range[1] : 0;
+    return pref;
+  }
+
   function eligibleIds(type, settings, playerCount) {
     var range = hotRange(settings);
     return DATA.cards
@@ -264,7 +287,16 @@
       if (!fresh.length) fresh = valid;
       deck = shuffle(fresh, rng);
     }
-    var id = deck.pop();
+    // Con picante alto, se adelantan las cartas más picantes del mazo para que
+    // no queden ahogadas entre las suaves (hay más cartas suaves que picantes).
+    var idx = deck.length - 1;
+    var minPreferred = spicePreference(state.settings);
+    if (minPreferred > 0 && rng() < 0.65) {
+      for (var k = deck.length - 1; k >= 0; k--) {
+        if (CARD_BY_ID[deck[k]].hot >= minPreferred) { idx = k; break; }
+      }
+    }
+    var id = deck.splice(idx, 1)[0];
     state.decks[type] = deck;
     state.recent.push(id);
     if (state.recent.length > RECENT_SIZE) state.recent.shift();
@@ -670,11 +702,13 @@
     TYPES: TYPES,
     MODES: MODES,
     HOT_LEVELS: HOT_LEVELS,
+    MAX_HOT: MAX_HOT,
     ALT_MODES: ALT_MODES,
     DEFAULT_SETTINGS: DEFAULT_SETTINGS,
     DATA: DATA,
     getMode: getMode,
     hotRange: hotRange,
+    spicePreference: spicePreference,
     eligibleIds: eligibleIds,
     validatePlayers: validatePlayers,
     normalizeSettings: normalizeSettings,
